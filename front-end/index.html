@@ -17,9 +17,11 @@
 <div ng-controller="HomeCtrl">
     <md-toolbar class="md-hue-2">
         <div class="md-toolbar-tools">
-            <h2>Tic Tac Toe Game</h2>
+            <h2>Tic Tac Toe</h2>
             <span flex></span>
-            <md-button class="md-fab md-mini" ng-click="toggleLeft()" aria-label="Favorite">
+            <h2>Player {{turn}}'s Turn</h2>
+            <span flex></span>
+            <md-button class="md-fab md-mini" ng-click="toggleRight()" aria-label="sidenav">
                 ...
             </md-button>
 
@@ -40,6 +42,5 @@
 
 
 <script src="app.js"></script>
-<!--<script src="script.js"></script>-->
 </body>
 </html>

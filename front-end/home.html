@@ -1,6 +1,8 @@
 <div layout="row" flex md-padding="">
+    <!--<h2>Player {{turn}}'s Turn</h2>-->
+
     <div flex="" layout="column">
-        <table id="scoreboard" align="center">
+            <table id="scoreboard" align="center">
             <tr>
                 <td> Player X</td>
                 <td width="40"> &nbsp; </td>
@@ -22,8 +24,7 @@
                 </td>
             </tr>
         </table>
-        <br/>
-        <h3>{{turn}}'s Turn</h3>
+
         <table align="center" id="tic-tac-toe">
             <tr ng-repeat="(row_index, row) in dummyArray track by $index">
                 <td ng-repeat="(column_index, column) in dummyArray track by $index"
@@ -33,65 +34,6 @@
                 </td>
             </tr>
         </table>
-        <!--<p>Turn: <b>{{game.current_mark}}</b></p>-->
     </div>
-    <!--<md-divider></md-divider>-->
-    <!--<div flex="5"></div>-->
-    <md-sidenav class="md-sidenav-right md-whiteframe-4dp" md-component-id="left">
-        <div layout="column" flex>
-        <!--<md-button ng-click="connectHandler()" ng-disabled="isConnected">Connect</md-button>-->
-        <!--<md-button ng-click="closeHandler()" ng-disabled="!isConnected">Disconnect</md-button>-->
-        <md-button class="md-raised" ng-click="init()">Reset</md-button>
-        <md-button class="md-raised" ng-click="pauseTimer()">Pause</md-button>
-        <md-button class="md-raised" ng-click="resumeTimer()">Resume</md-button>
-        <md-divider></md-divider>
-<br/><br/>
-        <div layout="row">
-            <b>Player X</b>
-            <div flex="5"></div>
-            <md-radio-group ng-model="player.X">
-                <md-radio-button value="user">User</md-radio-button>
-                <md-radio-button value="computer"> Computer</md-radio-button>
-            </md-radio-group>
-        </div>
-        <div ng-hide="player.X=='user'">
-            <p>Choose Algorithm</p>
-            <md-select ng-model="player.algorithmX">
-                <md-option  value="random">Random</md-option>
-                <md-option ng-value="($index+1)" ng-repeat="row in dummyArray track by $index">Minimax Depth {{$index+1}}</md-option>
-            </md-select>
-
-        </div>
-        <md-divider></md-divider>
-        <br/><br/>
-
-        <div layout="row">
-            <b>Player O</b>
-            <div flex="5"></div>
-            <md-radio-group ng-model="player.O">
-                <md-radio-button value="user">User</md-radio-button>
-                <md-radio-button value="computer"> Computer</md-radio-button>
-            </md-radio-group>
-        </div>
-        <div ng-hide="player.O=='user'">
-            <p>Choose Algorithm</p>
-            <md-select ng-model="player.algorithmO">
-                <md-option value="random">Random</md-option>
-                <md-option ng-value="($index+1)" ng-repeat="row in dummyArray track by $index">Minimax Depth {{$index+1}}</md-option>
-            </md-select>
-        </div>
-        <!--<select ng-model="game.grid_size"-->
-        <!--ng-options="option.value as option.label for option in grid_options"-->
-        <!--ng-change="game.init()">-->
-        <!--</select>-->
-        <md-divider></md-divider>
-        <br/>
-        <b>Select Board Size</b>
-
-            <md-select ng-model="grid_size" ng-change="init(grid_size)">
-                <md-option ng-value="option.value" ng-repeat="option in grid_options">{{option.label}}</md-option>
-            </md-select>
-        <!--</div>-->
-    </div>
-        </md-sidenav>
+    <div ng-include='"sidenav.html"'></div>
 </div>

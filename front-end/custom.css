@@ -12,10 +12,10 @@ body {
 
 #tic-tac-toe td {
     border: 2px solid #000;
-    height: 100px;
-    width: 100px;
+    height: 70px;
+    width: 70px;
     text-align: center;
-    font: bold 60px comic sans ms;
+    font: bold 40px comic sans ms;
 }
 
 #tic-tac-toe tr:first-child td {

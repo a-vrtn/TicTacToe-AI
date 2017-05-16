@@ -11,7 +11,7 @@ public class GameModel {
 	int boardSize;
 	char player;
 	char opponent;
-
+	boolean shouldPrune;
 	public int getScore() {
 		return score;
 	}
@@ -35,7 +35,6 @@ public class GameModel {
 	public void setBoardSize(int boardSize) {
 		this.boardSize = boardSize;
 	}
-	
 
 	public char getPlayer() {
 		return player;
@@ -53,10 +52,10 @@ public class GameModel {
 		this.opponent = opponent;
 	}
 
-	public boolean movesLeft() {
+	public boolean movesLeft(char tmpBoard[][]) {
 		for (int i = 0; i < boardSize; i++) {
 			for (int j = 0; j < boardSize; j++) {
-				if (board[i][j] == ' ')
+				if (tmpBoard[i][j] == ' ')
 					return true;
 			}
 		}
@@ -76,38 +75,57 @@ public class GameModel {
 
 	public String calculateNextMove(String algorithm, char turn, int depth) {
 		int move = 0;
-		String message = evaluate();
+		String message = evaluate(board);
 		if (message == null) {
+			char board2[][] = new char[boardSize][boardSize];
+				for (int i = 0; i < boardSize; i++) {
+				for (int j = 0; j < boardSize; j++) {
+					board2[i][j] = board[i][j];
+				}
+			}
 			if (algorithm.equals("random")) {
 				move = randomAlgorithm(turn);
 			} else {
-				move = findBestMove(board, depth);
+				
+				move = findBestMove(depth);
 			}
-			board[move / boardSize][move % boardSize] = turn;
-			message = evaluate();
+			board2[move / boardSize][move % boardSize] = turn;
+			message = evaluate(board2);
 			return "{\"move\":\"" + move + "\",\"message\":\"" + message + "\"}";
 		}
 		return "{\"move\":\"" + -1 + "\",\"message\":\"" + message + "\"}";
 	}
 
-	private int minimaxAlgorithm(char board1[][], int depth, boolean isMax, int maxDepth) {
-		int score = evaluateMinimax();
+	private int minimaxAlgorithm(char tmpBoard[][], boolean isMax, int maxDepth, int alpha, int beta) {
+		int score = evaluateMinimax(tmpBoard);
+		if (maxDepth == 0)
+			return score;
 		if (score == 10)
-			return score-depth;
+			return score;
+		// return score - depth;
 		if (score == -10)
-			return depth+score;
-		if (movesLeft())
+			return score;
+		// return depth + score;
+		if (movesLeft(tmpBoard) == false)
+			// return 0- depth;
 			return 0;
-		if(depth==maxDepth)
-			return 0;
+		// if (depth == maxDepth)
+		// return 0;
 		if (isMax) {
 			int best = -1000;
 			for (int i = 0; i < boardSize; i++) {
 				for (int j = 0; j < boardSize; j++) {
-					if (board1[i][j] == ' ') {
-						board1[i][j] = player;
-						best = max(best, minimaxAlgorithm(board1, depth + 1, !isMax, maxDepth));
-						board1[i][j] = ' ';
+					if (tmpBoard[i][j] == ' ') {
+						tmpBoard[i][j] = player;
+						int value = minimaxAlgorithm(tmpBoard, !isMax, maxDepth - 1, alpha, beta);
+						best = max(best, value);
+						if (boardSize > 3) {
+							if (best > alpha)
+								alpha = best;
+							if (alpha >= beta)
+								break; // beta cut-off
+						}
+						tmpBoard[i][j] = ' ';
 					}
 				}
 			}
@@ -116,10 +134,17 @@ public class GameModel {
 			int best = 1000;
 			for (int i = 0; i < boardSize; i++) {
 				for (int j = 0; j < boardSize; j++) {
-					if (board1[i][j] == ' ') {
-						board1[i][j] = opponent;
-						best = min(best, minimaxAlgorithm(board1, depth + 1, !isMax, maxDepth));
-						board1[i][j] = ' ';
+					if (tmpBoard[i][j] == ' ') {
+						tmpBoard[i][j] = opponent;
+						int value = minimaxAlgorithm(tmpBoard, !isMax, maxDepth - 1, alpha, beta);
+						best = min(best, value);
+						if (shouldPrune) {
+							if (best < beta)
+								beta = best;
+							if (alpha >= beta)
+								break; // alpha cut-off
+						}
+						tmpBoard[i][j] = ' ';
 					}
 				}
 			}
@@ -127,18 +152,29 @@ public class GameModel {
 		}
 	}
 
-	int findBestMove(char[][] board1, int depth) {
+	int findBestMove(int depth) {
+		char[][] tmpBoard = board;
 		int bestValue = -1000;
 		int bestMove = -1;
+		Random rand = new Random();
+		shouldPrune=false;
+		if(boardSize>3 && depth==boardSize*boardSize)
+			shouldPrune=true;
 		for (int i = 0; i < boardSize; i++) {
 			for (int j = 0; j < boardSize; j++) {
-				if (board1[i][j] == ' ') {
-					board1[i][j] = player;
-					int moveValue = minimaxAlgorithm(board1, 0, false, depth);
-					board1[i][j] = ' ';
+				if (tmpBoard[i][j] == ' ') {
+					tmpBoard[i][j] = player;
+					int moveValue = minimaxAlgorithm(tmpBoard, false, depth, -1000, 1000);
+					tmpBoard[i][j] = ' ';
 					if (moveValue > bestValue) {
 						bestMove = (i * boardSize + j);
 						bestValue = moveValue;
+					}
+					if (moveValue == bestValue) {
+						if (rand.nextInt(2) == 0) {
+							bestMove = (i * boardSize + j);
+							bestValue = moveValue;
+						}
 					}
 				}
 			}
@@ -149,26 +185,15 @@ public class GameModel {
 	private int min(int element1, int element2) {
 		if (element1 < element2)
 			return element1;
-		if (element1 > element2)
-			return element2;
-		Random rand= new Random();
-		if(rand.nextInt(2)==0)
-			return element1;
 		return element2;
 	}
 
 	private int max(int element1, int element2) {
 		if (element1 > element2)
 			return element1;
-		
-		if (element1 < element2)
-			return element2;
-		Random rand= new Random();
-		
-		if(rand.nextInt(2)==0)
-			return element1;
+
 		return element2;
-		
+
 	}
 
 	public int randomAlgorithm(char turn) {
@@ -180,11 +205,11 @@ public class GameModel {
 		return availableMoves.get(randomMove);
 	}
 
-	public int evaluateMinimax() {
+	public int evaluateMinimax(char tmpBoard[][]) {
 
-		if (hasWon(player))
+		if (hasWon(tmpBoard, player))
 			return +10;
-		if (hasWon(opponent))
+		if (hasWon(tmpBoard, opponent))
 			return -10;
 		// if (movesLeft() == false)
 		// return 0;
@@ -192,37 +217,37 @@ public class GameModel {
 
 	}
 
-	public String evaluate() {
-		if (hasWon('X'))
+	public String evaluate(char tmpBoard[][]) {
+		if (hasWon(tmpBoard, 'X'))
 			return "X has won";
-		if (hasWon('O'))
+		if (hasWon(tmpBoard, 'O'))
 			return "O has won";
-		if (movesLeft() == false)
+		if (movesLeft(tmpBoard) == false)
 			return "it's a draw";
 		return null;
 
 	}
 
-	public boolean hasWon(char turn) {
+	public boolean hasWon(char tmpBoard[][], char turn) {
 		int vertical_count = 0, horizontal_count = 0, right_to_left_count = 0, left_to_right_count = 0;
 		// Checking for Rows for X or O victory.
 		for (int i = 0; i < boardSize; i++) {
 			vertical_count = 0;
 			horizontal_count = 0;
 			for (int j = 0; j < boardSize; j++) {
-				if (board[i][j] == turn) {
+				if (tmpBoard[i][j] == turn) {
 					horizontal_count++;
 				}
 
-				if (board[j][i] == turn) {
+				if (tmpBoard[j][i] == turn) {
 					vertical_count++;
 				}
 			}
-			if (board[i][i] == turn) {
+			if (tmpBoard[i][i] == turn) {
 				left_to_right_count++;
 			}
 
-			if (board[(boardSize - 1 - i)][i] == turn) {
+			if (tmpBoard[(boardSize - 1 - i)][i] == turn) {
 				right_to_left_count++;
 			}
 

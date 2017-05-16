@@ -21,7 +21,6 @@ public class GameService {
 	{
 		GameModel gm= new GameModel();
 		char board[][]=new char[boardSize][boardSize];
-//		 boardList="";
 		int counter=0;
 		
 		for(int i=0;i<boardSize;i++)
@@ -34,36 +33,12 @@ public class GameService {
 		}
 		gm.setBoard(board);
 		gm.setBoardSize(boardSize);
-		boolean message=  gm.hasWon(turn);
+		boolean message=  gm.hasWon(board, turn);
 				
 		return "{ \"message\":\"" + message + "\"}";
-//		return boardList;
 	}
 	
-	@CrossOrigin(origins = "*", maxAge = 3600)
-	@PostMapping(value  = "/V1/evaluate")
-	public String evaluate(@RequestParam (value = "board[]" , required = true)  char[] boardArray,
-//			@RequestParam (value = "turn" , required = true, defaultValue = "")  char turn,
-			@RequestParam (value = "boardSize" , required = true)  int boardSize)
-	{
-		GameModel gm= new GameModel();
-		char board[][]=new char[boardSize][boardSize];
-//		 boardList="";
-		int counter=0;
-		
-		for(int i=0;i<boardSize;i++)
-		{
-			for(int j=0;j<boardSize;j++)
-			{
-				board[i][j]=boardArray[counter];
-				counter++;
-			}
-		}
-		gm.setBoard(board);
-		gm.setBoardSize(boardSize);
-		String message=  gm.evaluate();
-		return "{ \"message\":\"" + message + "\"}";
-	}
+	
 	@CrossOrigin(origins = "*", maxAge = 3600)
 	@PostMapping(value  = "/V1/nextMove")
 	public String nextMove(@RequestParam (value = "board[]" , required = true)  char[] boardArray,

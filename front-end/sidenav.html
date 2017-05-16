@@ -1,0 +1,59 @@
+<md-sidenav class="md-sidenav-right md-whiteframe-4dp" md-component-id="right">
+    <div layout="column" class="md-padding">
+        <div layout="row" flex="">
+        <md-button flex="" class="md-raised md-info" ng-click="init()">Reset</md-button>
+
+        <div ng-hide="isPaused">
+        <md-button flex="" class="md-raised md-warn" ng-click="pauseTimer()">Pause</md-button>
+        </div>
+        <div ng-show="isPaused">
+        <md-button flex=""  class="md-raised md-primary" ng-click="resumeTimer()">Resume</md-button>
+</div>
+        </div>
+        <div  class="md-padding">
+        <label>Player X</label>
+            <md-radio-group ng-model="player.X">
+                <md-radio-button value="user">User</md-radio-button>
+                <md-radio-button value="computer">Computer</md-radio-button>
+            </md-radio-group>
+        <div ng-show="player.X=='computer'">
+            <label>Choose Algorithm</label>
+            <md-select ng-model="player.algorithmX">
+                <md-option  value="random">Random</md-option>
+                <md-option ng-value="($index+1)" ng-repeat="row in dummyArray2 track by $index">Minimax Depth {{$index+1}}</md-option>
+            </md-select>
+
+        </div>
+            <label>Player O</label>
+            <md-radio-group ng-model="player.O">
+                <md-radio-button value="user">User</md-radio-button>
+                <md-radio-button value="computer"> Computer</md-radio-button>
+            </md-radio-group>
+        <div ng-show="player.O=='computer'">
+            <label>Choose Algorithm</label>
+            <md-select ng-model="player.algorithmO">
+                <md-option value="random">Random</md-option>
+                <md-option ng-value="($index+1)" ng-repeat="row in dummyArray2 track by $index">Minimax Depth {{$index+1}}</md-option>
+            </md-select>
+        </div>
+        </div>
+        <label>Select Board Size</label>
+        <md-slider-container>
+            <md-slider ng-change="init(grid_size)" flex min="3" max="23" ng-model="grid_size" aria-label="grid_size" id="grid_size-slider">
+            </md-slider>
+        <md-input-container>
+            <input flex type="number" min="3" max="23"  ng-model="grid_size" ng-change="init(grid_size)" aria-label="grid_size" aria-controls="grid_size-slider">
+        </md-input-container>
+        </md-slider-container>
+        <br/>
+        <label>Select Interval</label>
+        <md-slider-container>
+            <md-slider flex min="1" max="5000" ng-model="interval" ng-change="changeInterval(interval)" >
+            </md-slider>
+            <md-input-container>
+                <input flex type="number" ng-change="changeInterval(interval)" ng-model="interval">
+            </md-input-container>
+        </md-slider-container>
+
+    </div>
+</md-sidenav>
